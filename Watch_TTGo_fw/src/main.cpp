@@ -15,6 +15,9 @@ BMA *sensor;
 
 uint32_t sessionId = 30;
 
+auto updateTimeout = 0ul;
+auto last = 0ul;
+
 volatile uint8_t state;
 volatile bool irqBMA = false;
 volatile bool irqButton = false;
@@ -25,7 +28,8 @@ bool sessionSent = false;
 void initHikeWatch()
 {
     // LittleFS
-    if(!LITTLEFS.begin(FORMAT_LITTLEFS_IF_FAILED)){
+    if (!LITTLEFS.begin(FORMAT_LITTLEFS_IF_FAILED))
+    {
         Serial.println("LITTLEFS Mount Failed");
         return;
     }
@@ -38,27 +42,30 @@ void initHikeWatch()
 
     // Side button
     pinMode(AXP202_INT, INPUT_PULLUP);
-    attachInterrupt(AXP202_INT, [] {
-        irqButton = true;
-    }, FALLING);
+    attachInterrupt(
+        AXP202_INT, []
+        { irqButton = true; },
+        FALLING);
 
-    //!Clear IRQ unprocessed first
+    //! Clear IRQ unprocessed first
     watch->power->enableIRQ(AXP202_PEK_SHORTPRESS_IRQ, true);
     watch->power->clearIRQ();
 
     return;
 }
 
-void sendDataBT(fs::FS &fs, const char * path)
+void sendDataBT(fs::FS &fs, const char *path)
 {
     /* Sends data via SerialBT */
-    File file = fs.open(path);
-    if(!file || file.isDirectory()){
+    fs::File file = fs.open(path);
+    if (!file || file.isDirectory())
+    {
         Serial.println("- failed to open file for reading");
         return;
     }
     Serial.println("- read from file:");
-    while(file.available()){
+    while (file.available())
+    {
         SerialBT.write(file.read());
     }
     file.close();
@@ -83,7 +90,6 @@ void sendSessionBT()
     // Send connection termination char
     SerialBT.write('\n');
 }
-
 
 void saveIdToFile(uint16_t id)
 {
@@ -121,10 +127,10 @@ void setup()
     watch->begin();
     watch->openBL();
 
-    //Receive objects for easy writing
+    // Receive objects for easy writing
     tft = watch->tft;
     sensor = watch->bma;
-    
+
     initHikeWatch();
 
     state = 1;
@@ -139,17 +145,17 @@ void loop()
     case 1:
     {
         /* Initial stage */
-        //Basic interface
+        // Basic interface
         watch->tft->fillScreen(TFT_BLACK);
         watch->tft->setTextFont(4);
         watch->tft->setTextColor(TFT_WHITE, TFT_BLACK);
-        watch->tft->drawString("Hiking Watch",  45, 25, 4);
+        watch->tft->drawString("Hiking Watch", 45, 25, 4);
         watch->tft->drawString("Press button", 50, 80);
         watch->tft->drawString("to start session", 40, 110);
 
         bool exitSync = false;
 
-        //Bluetooth discovery
+        // Bluetooth discovery
         while (1)
         {
             /* Bluetooth sync */
@@ -162,11 +168,12 @@ void loop()
                     sessionSent = true;
                 }
 
-                if (sessionSent && sessionStored) {
+                if (sessionSent && sessionStored)
+                {
                     // Update timeout before blocking while
                     updateTimeout = 0;
                     last = millis();
-                    while(1)
+                    while (1)
                     {
                         updateTimeout = millis();
 
@@ -198,27 +205,30 @@ void loop()
             {
                 delay(1000);
                 watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
-                watch->tft->drawString("Hiking Watch",  45, 25, 4);
+                watch->tft->drawString("Hiking Watch", 45, 25, 4);
                 watch->tft->drawString("Press button", 50, 80);
                 watch->tft->drawString("to start session", 40, 110);
                 exitSync = false;
             }
 
             /*      IRQ     */
-            if (irqButton) {
+            if (irqButton)
+            {
                 irqButton = false;
                 watch->power->readIRQ();
                 if (state == 1)
                 {
                     state = 2;
+                    Serial.print("AAAAAAAAAAAAAAAAAAA");
                 }
                 watch->power->clearIRQ();
             }
-            if (state == 2) {
+            if (state == 2)
+            {
                 if (sessionStored)
                 {
                     watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
-                    watch->tft->drawString("Overwriting",  55, 100, 4);
+                    watch->tft->drawString("Overwriting", 55, 100, 4);
                     watch->tft->drawString("session", 70, 130);
                     delay(1000);
                 }
@@ -230,8 +240,12 @@ void loop()
     case 2:
     {
         /* Hiking session initalisation */
-        
-        state = 3;
+
+        // state = 3;
+        if (irqButton)
+        {
+            state = 1;
+        }
         break;
     }
     case 3:
@@ -252,13 +266,13 @@ void loop()
         last = millis();
         updateTimeout = 0;
 
-        //reset step-counter
+        // reset step-counter
     }
     case 4:
     {
-        //Save hiking session data
+        // Save hiking session data
         delay(1000);
-        state = 1;  
+        state = 1;
         break;
     }
     default:
