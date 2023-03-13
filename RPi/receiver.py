@@ -8,7 +8,7 @@ import bt
 hubdb = db.HubDatabase()
 hubbt = bt.HubBluetooth()
 
-def process_sessions(sessions: list[hike.HikeSession]):
+def process_sessions(sessions: "list[hike.HikeSession]"):
     """Callback function to process sessions.
 
     Calculates the calories for a hiking session.

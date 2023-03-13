@@ -13,7 +13,7 @@ hdb = db.HubDatabase()
 @app.route("/")
 def get_home():
     sessions = hdb.get_sessions()
-    return render_template("home.html", sessions=sessions)
+    return render_template("home.html", sessions=sessions, db=hdb)
 
 
 @app.route("/sessions")

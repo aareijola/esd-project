@@ -1,0 +1,16 @@
+<!doctype html>
+<title>Hike Watch</title>
+<h1>Hike Watch - Sessions</h1>
+<p>Sessions:</p>
+
+{% if sessions%}
+
+<ul>
+{% for session in sessions %}
+  <li>  Id: {{session.id}} -- Distance: {{session.km}} kilometers <button onclick="db.add_one_entry()">More</button></li>
+{% endfor %}
+</ul>
+
+{% else %}
+<p>There are no hiking sessions stored :(</p>
+{% endif %}

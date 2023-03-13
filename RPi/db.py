@@ -46,6 +46,9 @@ class HubDatabase:
 
         self.con.commit()
 
+    def add_one_entry(self):
+        self.save(hike.from_list([123, 69, 4200])) # test data
+
     def save(self, s: hike.HikeSession):
         sessions = self.get_sessions()
 

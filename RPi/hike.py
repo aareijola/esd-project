@@ -26,5 +26,5 @@ def from_list(l: list) -> HikeSession:
     s.id = l[0]
     s.km = l[1]
     s.steps = l[2]
-    s.kcal = l[3]
+    s.calc_kcal()
     return s
