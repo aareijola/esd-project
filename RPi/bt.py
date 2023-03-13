@@ -3,8 +3,9 @@ import time
 
 import hike
 
-WATCH_BT_MAC = 'XX:XX:XX:XX:XX:XX'
+WATCH_BT_MAC = "XX:XX:XX:XX:XX:XX"
 WATCH_BT_PORT = 1
+
 
 class HubBluetooth:
     """Handles Bluetooth pairing and synchronization with the Watch.
@@ -17,7 +18,7 @@ class HubBluetooth:
 
     connected = False
     sock = None
-    
+
     def wait_for_connection(self):
         """Synchronous function continuously trying to connect to the Watch by 2 sec intervals.
         If a connection has been made, it sends the watch a `c` ASCII character as a confirmation.
@@ -32,7 +33,7 @@ class HubBluetooth:
                     self.sock.connect((WATCH_BT_MAC, WATCH_BT_PORT))
                     self.sock.settimeout(2)
                     self.connected = True
-                    self.sock.send('c')
+                    self.sock.send("c")
                     print("Connected to Watch!")
                     break
                 except bluetooth.btcommon.BluetoothError:
@@ -63,12 +64,12 @@ class HubBluetooth:
             KeyboardInterrupt: to be able to close a running application.
         """
         print("Synchronizing with watch...")
-        remainder = b''
+        remainder = b""
         while True:
             try:
                 chunk = self.sock.recv(1024)
 
-                messages = chunk.split(b'\n')
+                messages = chunk.split(b"\n")
                 messages[0] = remainder + messages[0]
                 remainder = messages.pop()
 
@@ -78,7 +79,7 @@ class HubBluetooth:
 
                         sessions = HubBluetooth.messages_to_sessions(messages)
                         callback(sessions)
-                        self.sock.send('r')
+                        self.sock.send("r")
 
                         print(f"Saved. 'r' sent to the socket!")
 
@@ -91,17 +92,19 @@ class HubBluetooth:
                 raise KeyboardInterrupt("Shutting down the receiver.")
 
             except bluetooth.btcommon.BluetoothError as bt_err:
-                if bt_err.errno == 11: # connection down
+                if bt_err.errno == 11:  # connection down
                     print("Lost connection with the watch.")
                     self.connected = False
                     self.sock.close()
                     break
-                elif bt_err.errno == None: # possibly occured by socket.settimeout
-                    self.sock.send('c')
-                    print("Reminder has been sent to the Watch about the attempt of the synchronization.")
+                elif bt_err.errno == None:  # possibly occured by socket.settimeout
+                    self.sock.send("c")
+                    print(
+                        "Reminder has been sent to the Watch about the attempt of the synchronization."
+                    )
 
     @staticmethod
-    def messages_to_sessions(messages: list[bytes]) -> list[hike.HikeSession]:
+    def messages_to_sessions(messages: "list[bytes]") -> "list[hike.HikeSession]":
         """Transforms multiple incoming messages to a list of hike.HikeSession objects.
 
         Args:
@@ -134,20 +137,24 @@ class HubBluetooth:
         Raises:
             AssertionError: if the message misses information, or if it is badly formatted.
         """
-        m = message.decode('utf-8')
+        m = message.decode("utf-8")
 
         # filtering because we might have a semi-column at the end of the message, right before the new-line character
-        parts = list(filter(lambda p: len(p) > 0, m.split(';')))
-        assert len(parts) >= 3, f"MessageProcessingError -> The incoming message doesn't contain enough information: {m}"
+        parts = list(filter(lambda p: len(p) > 0, m.split(";")))
+        assert (
+            len(parts) >= 3
+        ), f"MessageProcessingError -> The incoming message doesn't contain enough information: {m}"
 
         hs = hike.HikeSession()
-        hs.id     = int(parts[0])
-        hs.steps  = int(parts[1])
-        hs.km     = float(parts[2])
+        hs.id = int(parts[0])
+        hs.steps = int(parts[1])
+        hs.km = float(parts[2])
 
         def cvt_coord(c):
-            sc = c.split(',')
-            assert len(sc) == 2, f"MessageProcessingError -> Unable to process coordinate: {c}"
+            sc = c.split(",")
+            assert (
+                len(sc) == 2
+            ), f"MessageProcessingError -> Unable to process coordinate: {c}"
             return float(sc[0]), float(sc[1])
 
         if len(parts) > 3:

@@ -1,6 +1,7 @@
 MET_HIKING = 6
 KCAL_PER_STEP = 0.04
 
+
 class HikeSession:
     id = 0
     km = 0
@@ -15,8 +16,10 @@ class HikeSession:
     def __repr__(self):
         return f"HikeSession{{{self.id}, {self.km}(km), {self.steps}(steps), {self.kcal:.2f}(kcal)}}"
 
+
 def to_list(s: HikeSession) -> list:
     return [s.id, s.km, s.steps, s.kcal]
+
 
 def from_list(l: list) -> HikeSession:
     s = HikeSession()
