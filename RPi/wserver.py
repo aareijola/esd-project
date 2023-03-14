@@ -13,7 +13,7 @@ hdb = db.HubDatabase()
 @app.route("/")
 def get_home():
     sessions = hdb.get_sessions()
-    return render_template("home.html", sessions=sessions, db=hdb)
+    return render_template("home.html", sessions=sessions)
 
 
 @app.route("/sessions")
@@ -35,6 +35,13 @@ def delete_session(id):
     hdb.delete(id)
     print(f"DELETED SESSION WITH ID: {id}")
     return Response(status=202)
+
+
+@app.route("/sessions/ADD_ONE")
+def add_one_session():
+    # quick and dirty function to add one entry to DB
+    hdb.add_one_entry()
+    return Response(status=201)
 
 
 if __name__ == "__main__":
