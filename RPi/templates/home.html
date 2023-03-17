@@ -10,19 +10,30 @@
 </head>
 
 <body>
+    <div class="header" style="background-color:rgb(53, 116, 233)">
+        <div class="container">
+            <h1 class="display-1" style="color:white">Hike Watch - Sessions</h1>
+        </div>
+        <br />
+    </div>
     <div class="container">
-        <h1>Hike Watch - Sessions</h1>
-        <p>Sessions:</p>
+        <br />
+        <p>Currently stored sessions:</p>
 
         {% if sessions%}
 
         <ul class="list-group list-group-flush">
             {% for session in sessions %}
             <li class="list-group-item"> Id: {{ session.id }} -- Distance: {{ session.km }} kilometers <button
-                    id="btn{{ session.id }}" onclick="swapTextState({{ session.id }})">More</button> <!-- THIS IS NOT A SYNTAX ERROR EVEN THOUGH IDES MIGHT TELL YOU SO.
+                    type="button" id="btn{{ session.id }}" onclick="swapTextState({{ session.id }})">More</button> <!-- THIS IS NOT A SYNTAX ERROR EVEN THOUGH IDES MIGHT TELL YOU SO.
                     JINJA WILL PREPROCESS THE LINE TO BECOME VALID HTML/JavaScript -->
             </li>
-            <div style="display: none" id="{{ session.id }}">These are additional details about session {{ session.id }}
+            <div class="list-group-item list-group-item-secondary" style="display: none; color: black"
+                id="{{ session.id }}">
+                <p>During hiking session {{
+                    session.id }}, you took a total of {{ session.steps }} steps over {{ session.km }} kilometers.
+                </p>
+                <p>Estimated calories burnt: {{ session.kcal }} kcal.</p>
             </div>
             {% endfor %}
         </ul>
@@ -37,7 +48,6 @@
             const swapTextState = (id) => {
                 const element = document.getElementById(id);
                 const button = document.getElementById("btn" + id.toString());
-                console.log("id:", id);
                 if (element.style.display == "none") {
                     element.style.display = "inline";
                     button.innerHTML = "Less";
