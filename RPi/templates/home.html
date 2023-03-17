@@ -61,9 +61,13 @@
                 if (element.style.display == "none") {
                     element.style.display = "inline";
                     button.innerHTML = "Less";
+                    button.style.backgroundColor = "white";
+                    button.style.color = "#0d6efd"
                 } else if (element.style.display == "inline") {
                     element.style.display = "none";
                     button.innerHTML = "More";
+                    button.style.color = "white";
+                    button.style.backgroundColor = "#0d6efd"
                 }
             }
             const deleteSession = (id) => {
