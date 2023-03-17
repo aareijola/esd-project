@@ -67,6 +67,12 @@
                 }
             }
             const deleteSession = (id) => {
+                if (window.confirm("Are you sure you want to delete the hiking session?")) {
+                    handleDeleteSession(id);
+                }
+            }
+
+            const handleDeleteSession = (id) => {
                 $.ajax({
                     url: `/sessions/${id}/delete`,
                     type: 'post',
