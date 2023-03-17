@@ -1,8 +1,4 @@
-from flask import Flask
-from flask import render_template
-from flask import jsonify
-from flask import Response
-
+from flask import Flask, redirect, render_template, jsonify, Response
 import db
 import hike
 
@@ -30,11 +26,12 @@ def get_session_by_id(id):
     return jsonify(hike.to_list(session))
 
 
-@app.route("/sessions/<id>/delete")
+@app.route("/sessions/<id>/delete", methods=["POST"])
 def delete_session(id):
     hdb.delete(id)
     print(f"DELETED SESSION WITH ID: {id}")
     return Response(status=202)
+    # return redirect("/", code=200)
 
 
 @app.route("/sessions/ADD_ONE")

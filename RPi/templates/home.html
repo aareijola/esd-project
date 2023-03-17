@@ -7,6 +7,7 @@
     <title>Hike Watch</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <style>
         button.right {
             float: right
@@ -29,8 +30,9 @@
 
         <ul class="list-group list-group-flush">
             {% for session in sessions %}
-            <li class="list-group-item"> Id: {{ session.id }} -- Distance: {{ session.km }} kilometers <button
-                    type="button" class="btn btn-primary right" id="btn{{ session.id }}"
+            <li class="list-group-item" id="{{ session.id  }}-li"> Id: {{ session.id }} -- Distance: {{ session.km }}
+                kilometers
+                <button type="button" class="btn btn-primary right" id="btn{{ session.id }}"
                     onclick="swapTextState({{ session.id }})">More</button> <!-- THIS IS NOT A SYNTAX ERROR EVEN THOUGH IDES MIGHT TELL YOU SO.
                     JINJA WILL PREPROCESS THE LINE TO BECOME VALID HTML/JavaScript -->
             </li>
@@ -38,6 +40,8 @@
                 id="{{ session.id }}">
                 <p>During hiking session {{
                     session.id }}, you took a total of {{ session.steps }} steps over {{ session.km }} kilometers.
+                    <button type="button" class="btn btn-danger right"
+                        onclick="deleteSession({{ session.id }})">Delete</button>
                 </p>
                 <p>Estimated calories burnt: {{ session.kcal }} kcal.</p>
             </div>
@@ -61,6 +65,16 @@
                     element.style.display = "none";
                     button.innerHTML = "More";
                 }
+            }
+            const deleteSession = (id) => {
+                $.ajax({
+                    url: `/sessions/${id}/delete`,
+                    type: 'post',
+                    success: () => {
+                        document.getElementById(`${id}-li`).style.display = "none";
+                        document.getElementById(`${id}`).style.display = "none";
+                    }
+                })
             }
         </script>
     </div>
