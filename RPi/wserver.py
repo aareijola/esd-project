@@ -1,6 +1,7 @@
 from flask import Flask, redirect, render_template, jsonify, Response
 import db
 import hike
+import json
 
 app = Flask(__name__)
 hdb = db.HubDatabase()
@@ -9,7 +10,13 @@ hdb = db.HubDatabase()
 @app.route("/")
 def get_home():
     sessions = hdb.get_sessions()
-    return render_template("home.html", sessions=sessions)
+    return render_template(
+        "home.html",
+        sessions=sessions,
+        data_json=json.dumps(
+            list(map(lambda s: hike.to_list(s), sessions))
+        ),  # forgive me
+    )
 
 
 @app.route("/sessions")

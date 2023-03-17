@@ -28,3 +28,38 @@ const handleDeleteSession = (id) => {
       }
   })
 }
+
+const renderChart = ( data ) => {
+  const ctx = document.getElementById('barChart');
+  const sessions = data.reduce(
+    (acc, curr, i) => {
+      acc[i] = {
+        id: curr[0],
+        km: curr[1],
+        steps: curr[2],
+        kcal: curr[3],
+      };
+      return acc; 
+    }
+  , []);
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: sessions.map(s => `Session ${s.id}`),
+      datasets: [{
+        label: 'Travelled distance [km]',
+        data: sessions.map(s => s.km),
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+
+renderChart()
