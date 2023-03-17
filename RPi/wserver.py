@@ -10,9 +10,11 @@ hdb = db.HubDatabase()
 @app.route("/")
 def get_home():
     sessions = hdb.get_sessions()
+    data = hdb.calculate_values() #data for summary
     return render_template(
         "home.html",
         sessions=sessions,
+        data=data,
         data_json=json.dumps(
             list(map(lambda s: hike.to_list(s), sessions))
         ),  # forgive me

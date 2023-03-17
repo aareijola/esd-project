@@ -105,6 +105,16 @@ class HubDatabase:
             self.lock.release()
 
         return hike.from_list(rows[0])
+    
+    def calculate_values(self):
+        kcals = 0
+        km = 0
+        steps = 0
+        for session in self.get_sessions():
+            kcals = kcals + session.kcal
+            km = km + session.km
+            steps = steps + session.steps
+        return [km, steps, kcals, km/len(self.get_sessions()), steps/len(self.get_sessions()), kcals/len(self.get_sessions())]
 
     def __del__(self):
         self.cur.close()
