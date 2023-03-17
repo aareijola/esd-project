@@ -66,8 +66,7 @@
                 } else if (element.style.display == "inline") {
                     element.style.display = "none";
                     button.innerHTML = "More";
-                    button.style.color = "white";
-                    button.style.backgroundColor = "#0d6efd"
+                    button.style = "revert";
                 }
             }
             const deleteSession = (id) => {
