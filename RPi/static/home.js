@@ -1,3 +1,21 @@
+var sessions = []
+var chart = {}
+
+const updateSessions = (data) => {
+  sessions = data.reduce(
+    (acc, curr, i) => {
+      acc[i] = {
+        id: curr[0],
+        km: curr[1],
+        steps: curr[2],
+        kcal: curr[3],
+      };
+      return acc; 
+    }
+  , []);
+}
+
+
 const swapTextState = (id) => {
   const element = document.getElementById(id);
   const button = document.getElementById("btn" + id.toString());
@@ -25,24 +43,34 @@ const handleDeleteSession = (id) => {
       success: () => {
           document.getElementById(`${id}-li`).style.display = "none";
           document.getElementById(`${id}`).style.display = "none";
+          sessions = sessions.filter(s => s.id != id);
+          updateChart();
       }
   })
 }
 
-const renderChart = ( data ) => {
-  const ctx = document.getElementById('barChart');
-  const sessions = data.reduce(
-    (acc, curr, i) => {
-      acc[i] = {
-        id: curr[0],
-        km: curr[1],
-        steps: curr[2],
-        kcal: curr[3],
-      };
-      return acc; 
-    }
-  , []);
-  new Chart(ctx, {
+const updateChart = () => {
+  chart.data = {
+    labels: sessions.map(s => `Session ${s.id}`),
+    datasets: [{
+      label: 'Travelled distance [km]',
+      data: sessions.map(s => s.km),
+      borderWidth: 1
+    }]
+  };
+  chart.update();
+}
+
+const updateAndRender = (data) => {
+  updateSessions(data);
+  renderChart(sessions);
+}
+
+const renderChart = ( sessions ) => {
+  const canvas = document.getElementById('barChart');
+  const ctx = canvas.getContext("2d");
+  //ctx.clearRect(0, 0, canvas.width, canvas.height);
+  chart = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: sessions.map(s => `Session ${s.id}`),
@@ -60,6 +88,5 @@ const renderChart = ( data ) => {
       }
     }
   });
+  chart.update();
 }
-
-renderChart()

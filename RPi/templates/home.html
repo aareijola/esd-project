@@ -32,11 +32,9 @@
         <br />
     </div>
 
-    <div class="container" name="graph">
-        <div style="max-height:750px;">
-            <canvas id="barChart"></canvas>
-            <script>renderChart({{ data_json| safe }})</script>
-        </div>
+    <div class="container" name="graph" style="max-height:750px;">
+        <canvas id="barChart"></canvas>
+        <script>updateAndRender({{ data_json| safe }})</script>
     </div>
 
     <div class="container" name="stored-sessions">
