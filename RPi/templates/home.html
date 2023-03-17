@@ -7,10 +7,15 @@
     <title>Hike Watch</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <style>
+        button.right {
+            float: right
+        }
+    </style>
 </head>
 
 <body>
-    <div class="header" style="background-color:rgb(53, 116, 233)">
+    <div class="header" style="background-color:#0d6efd">
         <div class="container">
             <h1 class="display-1" style="color:white">Hike Watch - Sessions</h1>
         </div>
@@ -25,7 +30,8 @@
         <ul class="list-group list-group-flush">
             {% for session in sessions %}
             <li class="list-group-item"> Id: {{ session.id }} -- Distance: {{ session.km }} kilometers <button
-                    type="button" id="btn{{ session.id }}" onclick="swapTextState({{ session.id }})">More</button> <!-- THIS IS NOT A SYNTAX ERROR EVEN THOUGH IDES MIGHT TELL YOU SO.
+                    type="button" class="btn btn-primary right" id="btn{{ session.id }}"
+                    onclick="swapTextState({{ session.id }})">More</button> <!-- THIS IS NOT A SYNTAX ERROR EVEN THOUGH IDES MIGHT TELL YOU SO.
                     JINJA WILL PREPROCESS THE LINE TO BECOME VALID HTML/JavaScript -->
             </li>
             <div class="list-group-item list-group-item-secondary" style="display: none; color: black"
