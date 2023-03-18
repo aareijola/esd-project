@@ -40,6 +40,23 @@ void initHikeWatch()
     // Reset steps
     // Turn on step interrupt
 
+    Acfg cfg; //Accel paramter structure
+    cfg.odr = BMA4_OUTPUT_DATA_RATE_100HZ;
+    cfg.range = BMA4_ACCEL_RANGE_2G;
+    cfg.bandwidth = BMA4_ACCEL_NORMAL_AVG4;
+    cfg.perf_mode = BMA4_CONTINUOUS_MODE;
+    sensor->accelConfig(cfg);
+    sensor->enableAccel();
+    pinMode(BMA423_INT1, INPUT);
+    attachInterrupt(BMA423_INT1, [] {
+        irqBMA = 1;
+    }, RISING);
+    // Enable BMA423 isStepCounter feature
+    sensor->enableFeature(BMA423_STEP_CNTR, true);
+    sensor->enableStepCountInterrupt();
+    
+
+
     // Side button
     pinMode(AXP202_INT, INPUT_PULLUP);
     attachInterrupt(
@@ -212,6 +229,8 @@ void loop()
             }
 
             /*      IRQ     */
+            Serial.print("\nBBBBBBBBBBBBB\n"); //debug
+            Serial.print(irqButton); //debug
             if (irqButton)
             {
                 irqButton = false;
@@ -219,7 +238,7 @@ void loop()
                 if (state == 1)
                 {
                     state = 2;
-                    Serial.print("AAAAAAAAAAAAAAAAAAA");
+                    Serial.print("\nAAAAAAAAAAAAAAAAAAA\n"); //debug
                 }
                 watch->power->clearIRQ();
             }
@@ -237,36 +256,75 @@ void loop()
         }
         break;
     }
-    case 2:
+    case 2: //should be HS init state
     {
-        /* Hiking session initalisation */
+    watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
+    watch->tft->drawString("Starting hike", 45, 100);
+    delay(1000);
+    watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
+    // Reset step counter
+    sensor->resetStepCounter();
 
-        // state = 3;
-        if (irqButton)
-        {
-            state = 1;
-        }
-        break;
+    state = 3;
+    break;
     }
-    case 3:
+    case 3: /* Hiking session ongoing */
     {
-        /* Hiking session ongoing */
-
-        watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
-        watch->tft->drawString("Starting hike", 45, 100);
-        delay(1000);
-        watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
+        // Basic interface
+        watch->tft->fillScreen(TFT_BLACK);
+        watch->tft->setTextFont(4);
+        watch->tft->setTextColor(TFT_WHITE, TFT_BLACK);
+        watch->tft->drawString("Hiking session", 20, 25, 4);
+        watch->tft->drawString("Press button to end", 20, 200);
 
         watch->tft->setCursor(45, 70);
         watch->tft->print("Steps: 0");
-
         watch->tft->setCursor(45, 100);
         watch->tft->print("Dist: 0 km");
+
+        float distance = 0;
+
+        while (1)
+        {
+            if (irqButton)
+            {
+                irqButton = false;
+                state = 1; //should go to state 4 eventually (not yet implemented)
+                break;
+            }
+            if (irqBMA) {
+                irqBMA = 0;
+
+                bool rlst;
+                do {
+                    rlst = sensor->readInterrupt();
+                } while (!rlst);
+
+                if (sensor->isStepCounter())
+                {
+                    distance = 0.7 * sensor->getCounter();
+                }
+                
+                watch->tft->fillScreen(TFT_BLACK);
+                watch->tft->setCursor(20, 70);
+                watch->tft->printf("Steps: %d", sensor->getCounter());
+                watch->tft->setCursor(20, 100);
+                watch->tft->printf("Distance: %.2f m", distance);
+                
+                Serial.print(sensor->getCounter()); //debug
+                Serial.printf("\n");
+            }
+
+            delay(10);
+            
+        }
 
         last = millis();
         updateTimeout = 0;
 
         // reset step-counter
+
+        break; //?
     }
     case 4:
     {
