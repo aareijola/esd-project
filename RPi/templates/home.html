@@ -38,18 +38,18 @@
     </div>
     <br />
     <div class="container text-center" style="border:1px solid #0d6efd" name="summary">
-        <br /> 
+        <br />
         <h5 class="header">Your average session and total information</h5>
         <br />
         <h6 class="subtitle mb-2 text-muted"> Your average hiking session</h6>
         <p> Average kilometers per hike: {{ data[3] }}</p>
-        <p> Average steps per hike:      {{ data[4] }}</p>
-        <p> Average kcalories per hike:  {{ data[5] }}</p>     
+        <p> Average steps per hike: {{ data[4] }}</p>
+        <p> Average kcalories per hike: {{ data[5] }}</p>
         <br />
         <h6 class="subtitle mb-2 text-muted">Total information of your hiking sessions</h6>
         <p> Total kilometers: {{ data[0] }}</p>
-        <p> Total steps:      {{ data[1] }}</p>
-        <p> Total kcals:      {{ data[2] }}</p>
+        <p> Total steps: {{ data[1] }}</p>
+        <p> Total kcals: {{ data[2] }}</p>
     </div>
     <br />
 
@@ -83,6 +83,15 @@
         <p>There are no hiking sessions stored :(</p>
         {% endif %}
     </div>
+    <br />
+    <br />
+    <br />
+    <div class="header" style="background-color:#0d6efd">
+        <div class="container">
+        </div>
+        <br />
+    </div>
+
 </body>
 
 </html>
