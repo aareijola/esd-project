@@ -3,7 +3,7 @@ import time
 
 import hike
 
-WATCH_BT_MAC = "XX:XX:XX:XX:XX:XX"
+WATCH_BT_MAC = "94:b5:55:c8:e9:c6"
 WATCH_BT_PORT = 1
 
 
@@ -30,6 +30,7 @@ class HubBluetooth:
                 print("Waiting for connection...")
                 try:
                     self.sock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+
                     self.sock.connect((WATCH_BT_MAC, WATCH_BT_PORT))
                     self.sock.settimeout(2)
                     self.connected = True
