@@ -25,6 +25,9 @@ volatile bool irqButton = false;
 bool sessionStored = false;
 bool sessionSent = false;
 
+float distance = 0;   
+uint32_t steps = 0;
+
 void initHikeWatch()
 {
     // LittleFS
@@ -177,7 +180,7 @@ void loop()
         {
             /* Bluetooth sync */
             if (SerialBT.available())
-            {
+            {   
                 char incomingChar = SerialBT.read();
                 if (incomingChar == 'c' and sessionStored and not sessionSent)
                 {
@@ -229,16 +232,13 @@ void loop()
             }
 
             /*      IRQ     */
-            Serial.print("\nBBBBBBBBBBBBB\n"); //debug
-            Serial.print(irqButton); //debug
             if (irqButton)
-            {
+            {   
                 irqButton = false;
                 watch->power->readIRQ();
                 if (state == 1)
                 {
                     state = 2;
-                    Serial.print("\nAAAAAAAAAAAAAAAAAAA\n"); //debug
                 }
                 watch->power->clearIRQ();
             }
@@ -277,19 +277,16 @@ void loop()
         watch->tft->drawString("Hiking session", 20, 25, 4);
         watch->tft->drawString("Press button to end", 20, 200);
 
-        watch->tft->setCursor(45, 70);
-        watch->tft->print("Steps: 0");
-        watch->tft->setCursor(45, 100);
-        watch->tft->print("Dist: 0 km");
-
-        float distance = 0;
+        
+        int calories = 0;
 
         while (1)
         {
             if (irqButton)
             {
                 irqButton = false;
-                state = 1; //should go to state 4 eventually (not yet implemented)
+                watch->power->clearIRQ();
+                state = 4; //should go to state 4 eventually (not yet implemented)
                 break;
             }
             if (irqBMA) {
@@ -299,26 +296,23 @@ void loop()
                 do {
                     rlst = sensor->readInterrupt();
                 } while (!rlst);
-
-                if (sensor->isStepCounter())
-                {
-                    distance = 0.7 * sensor->getCounter();
-                }
+                distance = 0.7 * sensor->getCounter();
+                steps = sensor->getCounter();
+                calories = steps*0.04;
                 
                 watch->tft->fillScreen(TFT_BLACK);
                 watch->tft->setCursor(20, 70);
-                watch->tft->printf("Steps: %d", sensor->getCounter());
+                watch->tft->printf("%d steps", sensor->getCounter());
                 watch->tft->setCursor(20, 100);
-                watch->tft->printf("Distance: %.2f m", distance);
-                
-                Serial.print(sensor->getCounter()); //debug
-                Serial.printf("\n");
+                watch->tft->printf("%.0f km %.0f m", floor(distance/1000), (distance - floor(distance/1000)*1000));
+                watch->tft->setCursor(20, 130);
+                watch->tft->printf("%d kcals", calories);
             }
 
             delay(10);
             
         }
-
+        
         last = millis();
         updateTimeout = 0;
 
@@ -329,8 +323,14 @@ void loop()
     case 4:
     {
         // Save hiking session data
-        delay(1000);
+        saveDistanceToFile(distance);
+        saveStepsToFile(steps);
+        saveIdToFile(sessionId);
+        watch->tft->fillRect(0, 0, 240, 240, TFT_BLACK);
+        watch->tft->drawString("Session saved", 45, 100);
+        delay(2000);
         state = 1;
+        sessionStored = true;
         break;
     }
     default:
