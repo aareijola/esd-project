@@ -39,17 +39,17 @@ class HubDatabase:
     def __init__(self):
         self.con = sqlite3.connect(DB_FILE_NAME, check_same_thread=False)
         self.cur = self.con.cursor()
-        create_table_sql = (
-            f"create table if not exists {DB_SESSION_TABLE['name']} ({', '.join(DB_SESSION_TABLE['cols'])})"
-        )
+        create_table_sql = f"create table if not exists {DB_SESSION_TABLE['name']} ({', '.join(DB_SESSION_TABLE['cols'])})"
         self.cur.execute(create_table_sql)
 
         self.con.commit()
 
     def add_one_entry(self):
-        self.save(hike.from_list([123, 69, 4200])) # test data
+        self.save(hike.from_list([123, 69, 4200]))  # test data
 
     def save(self, s: hike.HikeSession):
+        if s.steps == 0:
+            return
         sessions = self.get_sessions()
 
         if len(sessions) > 0:
@@ -105,8 +105,10 @@ class HubDatabase:
             self.lock.release()
 
         return hike.from_list(rows[0])
-    
+
     def calculate_values(self):
+        if not self.get_sessions():
+            return [0, 0, 0, 0, 0, 0]
         kcals = 0
         km = 0
         steps = 0
@@ -114,7 +116,14 @@ class HubDatabase:
             kcals = kcals + session.kcal
             km = km + session.km
             steps = steps + session.steps
-        return [km, steps, kcals, km/len(self.get_sessions()), steps/len(self.get_sessions()), kcals/len(self.get_sessions())]
+        return [
+            km,
+            steps,
+            kcals,
+            km / len(self.get_sessions()),
+            steps / len(self.get_sessions()),
+            kcals / len(self.get_sessions()),
+        ]
 
     def __del__(self):
         self.cur.close()

@@ -149,7 +149,7 @@ class HubBluetooth:
         hs = hike.HikeSession()
         hs.id = int(parts[0])
         hs.steps = int(parts[1])
-        hs.km = float(parts[2])
+        hs.km = float(parts[2]) / 1000
 
         def cvt_coord(c):
             sc = c.split(",")
