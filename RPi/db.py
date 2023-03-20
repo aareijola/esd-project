@@ -107,6 +107,9 @@ class HubDatabase:
         return hike.from_list(rows[0])
 
     def calculate_values(self):
+        """
+        Calculates average values for the sessions stored in the database.
+        """
         if not self.get_sessions():
             return [0, 0, 0, 0, 0, 0]
         kcals = 0
