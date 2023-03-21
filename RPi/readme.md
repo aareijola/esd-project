@@ -1,12 +1,22 @@
-# Readme
-This directory contains the code for the hike watch hub.
+# Readme - RPi Hike Watch Hub
+This directory contains the code for the hike watch hub, intended to be run on Raspberry Pi.
 ## Installation
-On linux:
+On linux (also Raspbian):
+
+Before installing the python dependencies, install the bluetooth development dependencies through apt:
+```
+sudo apt update
+sudo apt-get install bluetooth bluez libbluetooth-dev
+```
+
+0. Navigate to this folder, which is `esd-project/RPi`
 1. Create the virtual environment using the command: `python3 -m venv venv`
 2. Activate the venv: `source venv/bin/activate`
 3. Install dependencies: `pip install -r requirements.txt`
 
 Windows:
+
+0. Navigate to this folder, which is `esd-project/RPi`
 1. Create the virtual environment: `py -m venv venv`
 2. Activate venv: `venv\Scripts\activate.bat`
 3. pip install dependencies: `pip install -r requirements.txt`
@@ -23,4 +33,4 @@ Necessary steps:
 
 Upon running the webserver, flask will inform you of the IP-address and port used to host the server. Ctrl-click this in the terminal or enter it into your browser of choice (in format http://ip-address:port) to access the website. 
 
-You are now ready to track your hikinh activity!
+You are now ready to track your hiking activity!
